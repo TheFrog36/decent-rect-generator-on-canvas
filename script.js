@@ -12,7 +12,8 @@ targetCanvas.height = height
 targetCanvas.width = width
 differenceCanvas.height = height
 differenceCanvas.width = width
-
+let contatore = 0
+let bestDifferenceSoFar = 100
 let rectArray = []
 let bestRectSoFar = [0,0,0,0,0,0,0,0,100]
 
@@ -28,7 +29,7 @@ function make_base() {
     base_image.src = './monalisa.png';
     base_image.onload = function () {
         targetCTX.drawImage(base_image, 0, 0);
-        everythingElse()
+            setInterval(everythingElse,1000)
     }
 }
 
@@ -67,14 +68,21 @@ function createRandomRect2(){
 }
 
 function everythingElse() {
-    for (let i = 0; i < 1000; i++) {
+    rectArray = []
+    for (let i = 0; i < 100; i++) {
         createRandomRect2()
         rectArray.sort((e1,e2) => e1[0] - e2[0])
     }
-    console.log(rectArray);
-    drawRect(rectArray[0])
-    console.log('yoyoyo');
-    console.log(rectArray);
+    if(bestDifferenceSoFar > rectArray[0][0]){
+        contatore++
+        drawRect(rectArray[0])
+        bestDifferenceSoFar = rectArray[0][0]
+        console.log(bestDifferenceSoFar)
+        console.log(contatore);
+    } else {
+        console.log('lippa');
+    }
+
 }
 
 function drawRect([useless,red, green, blue, opacity, rad, randomX, randomY, rectWidth, rectHeight]){
