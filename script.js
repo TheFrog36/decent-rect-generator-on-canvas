@@ -68,10 +68,10 @@ function everythingElse() {
         createRandomRect2()
     }
     console.log(rectArray);
-    drawRect(100,200,255,1,1,100,100,200,200)
+    drawRect(rectArray[12])
 }
 
-function drawRect(red, green, blue, opacity, rad, randomX, randomY, rectWidth, rectHeight){
+function drawRect([red, green, blue, opacity, rad, randomX, randomY, rectWidth, rectHeight]){
     const colorString = 'rgba(#RED, #GREEN, #BLUE, #OPACITY)'
     outputCTX.save()
     outputCTX.fillStyle = colorString
