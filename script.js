@@ -64,12 +64,23 @@ function createRandomRect2(){
 }
 
 function everythingElse() {
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 100; i++) {
         createRandomRect2()
     }
     console.log(rectArray);
+    drawRect(100,200,255,1,1,100,100,200,200)
 }
 
-
-
-
+function drawRect(red, green, blue, opacity, rad, randomX, randomY, rectWidth, rectHeight){
+    const colorString = 'rgba(#RED, #GREEN, #BLUE, #OPACITY)'
+    outputCTX.save()
+    outputCTX.fillStyle = colorString
+        .replace('#RED', red)
+        .replace('#GREEN',  green)
+        .replace('#BLUE',  blue)
+        .replace('#OPACITY', opacity)
+    outputCTX.translate(randomX, randomY)
+    outputCTX.rotate(rad)
+    outputCTX.fillRect(-rectWidth / 2, -rectHeight / 2, rectWidth, rectHeight)
+    outputCTX.restore()
+}
