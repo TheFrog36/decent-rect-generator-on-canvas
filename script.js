@@ -16,7 +16,7 @@ let contatore = 0
 let bestDifferenceSoFar = 100
 let rectArray = []
 let bestRectSoFar = [0,0,0,0,0,0,0,0,100]
-
+let colorTargetInfo  = []
 const inputCTX = canvasInput.getContext('2d')
 const outputCTX = canvasOutput.getContext('2d')
 const targetCTX = targetCanvas.getContext('2d')
@@ -24,16 +24,21 @@ const differenceCTX = differenceCanvas.getContext('2d')
 outputCTX.fillStyle = 'rgba(0, 0, 0, 1)'
 outputCTX.fillRect(0,0,width,height)
 
-function make_base() {
+
+function makeBase() {
     base_image = new Image();
     base_image.src = './monalisa.png';
     base_image.onload = function () {
         targetCTX.drawImage(base_image, 0, 0);
-            setInterval(everythingElse,1000)
+        colorTargetInfo = getRBGAvgAndStdDev(targetCanvas)
+    
+        // setInterval(everythingElse,50)
+        for(let i = 0; i < 1; i++) findOuterRect()
+       
     }
 }
 
-make_base()
+makeBase()
 
 inputCTX.fillStyle = 'rgba(100, 100, 255, 1)'
 
@@ -41,9 +46,9 @@ function createRandomRect2(){
     inputCTX.save()
     differenceCTX.drawImage(canvasOutput,0,0)
     const colorString = 'rgba(#RED, #GREEN, #BLUE, #OPACITY)'
-    const red = Math.random() * 255
-    const green = Math.random() * 255
-    const blue = Math.random() * 255
+    const red = generateGaussian(colorTargetInfo[0][0],colorTargetInfo[0][1])
+    const green = generateGaussian(colorTargetInfo[1][0],colorTargetInfo[1][1])
+    const blue = generateGaussian(colorTargetInfo[2][0],colorTargetInfo[2][1])
     const opacity  = Math.random() * (1 - 0.1) + 0.1;
     inputCTX.fillStyle = colorString
         .replace('#RED', red)
@@ -55,7 +60,8 @@ function createRandomRect2(){
     const randomY = Math.random() * height
     const rectWidth = Math.random() * maxRectSize
     const rectHeight = Math.random() * maxRectSize
-    const rad = Math.random() * Math.PI * 2
+    const randomAngle = Math.random() * 90
+    const rad = randomAngle * Math.PI / 180
     inputCTX.translate(randomX, randomY)
     inputCTX.rotate(rad)
     inputCTX.fillRect(-rectWidth / 2, -rectHeight / 2, rectWidth, rectHeight)
@@ -77,8 +83,8 @@ function everythingElse() {
         contatore++
         drawRect(rectArray[0])
         bestDifferenceSoFar = rectArray[0][0]
-        console.log(bestDifferenceSoFar)
-        console.log(contatore);
+        console.log('difference from target:',bestDifferenceSoFar+'%')
+        console.log('added:',contatore);
     } else {
         console.log('lippa');
     }
@@ -86,7 +92,6 @@ function everythingElse() {
 }
 
 function drawRect([useless,red, green, blue, opacity, rad, randomX, randomY, rectWidth, rectHeight]){
-    console.log('yoyo');
     const colorString = 'rgba(#RED, #GREEN, #BLUE, #OPACITY)'
     outputCTX.save()
     outputCTX.fillStyle = colorString
@@ -130,4 +135,77 @@ function differenceBetween2Images() {
     const totalDifferenceRounded = Math.round(totalDifference * 100) / 100
     // console.log('difference = ' + totalDifferenceRounded + '%')  //Stampo la differenza tra target e my
     return totalDifferenceRounded
+}
+
+function stop(){
+    contatore = 2000
+}
+
+function createRandomRect3(){
+    inputCTX.save()
+    differenceCTX.drawImage(canvasOutput,0,0)
+    const colorString = 'rgba(#RED, #GREEN, #BLUE, #OPACITY)'
+    const red = generateGaussian(colorTargetInfo[0][0],colorTargetInfo[0][1])
+    const green = generateGaussian(colorTargetInfo[1][0],colorTargetInfo[1][1])
+    const blue = generateGaussian(colorTargetInfo[2][0],colorTargetInfo[2][1])
+    const opacity  = Math.random() * (1 - 0.3) + 0.3;
+    inputCTX.fillStyle = colorString
+        .replace('#RED', red)
+        .replace('#GREEN',  green)
+        .replace('#BLUE',  blue)
+        .replace('#OPACITY', opacity)
+    const maxRectSize = width < height ? width / 1.2 : height /1.2  //la grandezza massima del rettangolo è la metà del lato più piccolo di canvas
+    const randomX = Math.random() * width
+    const randomY = Math.random() * height
+    const rectWidth = Math.random() * maxRectSize
+    const rectHeight = Math.random() * maxRectSize
+    const randomAngle = Math.random() * 90
+    const rad = randomAngle * Math.PI / 180
+    inputCTX.translate(randomX, randomY)
+    inputCTX.rotate(rad)
+    inputCTX.fillRect(-rectWidth / 2, -rectHeight / 2, rectWidth, rectHeight)
+    const tempArray = inputCTX.getImageData(0,0,width,height).data;
+    let sum = 0
+    for(let i = 0; i < tempArray.length; i++){
+        sum += tempArray[i]
+    }
+    console.log(sum);
+    const difference = differenceBetween2Images()
+    inputCTX.clearRect(0,0,width, height)
+    rectArray.push([difference, red, green, blue, opacity, rad, randomX, randomY, rectWidth, rectHeight])
+    return [difference, red, green, blue, opacity, rad, randomX, randomY, rectWidth, rectHeight]
+}
+
+function findOuterRect(){
+    inputCTX.save()
+    differenceCTX.drawImage(canvasOutput,0,0)
+    const colorString = 'rgba(#RED, #GREEN, #BLUE, #OPACITY)'
+    const red = 255
+    const green = 255
+    const blue = 255
+    const opacity  = 0.5
+    inputCTX.fillStyle = colorString
+        .replace('#RED', red)
+        .replace('#GREEN',  green)
+        .replace('#BLUE',  blue)
+        .replace('#OPACITY', opacity)
+    const maxRectSize = width < height ? width / 1.2 : height /1.2  //la grandezza massima del rettangolo è la metà del lato più piccolo di canvas
+    const randomX = Math.random() * width
+    const randomY = Math.random() * height
+    const rectWidth = Math.random() * maxRectSize
+    const rectHeight = Math.random() * maxRectSize
+    const randomAngle = Math.random() * 90
+    const rad = randomAngle * Math.PI / 180
+    inputCTX.translate(randomX, randomY)
+    inputCTX.rotate(rad)
+    inputCTX.fillRect(-rectWidth / 2, -rectHeight / 2, rectWidth, rectHeight)
+    inputCTX.restore()
+    inputCTX.fillStyle = 'rgba(255, 0, 0, 0.5)'
+    const newWidth = (rectWidth* Math.cos(rad)) + (rectHeight * Math.sin(rad))  //Dimensioni del rettangolo che contengono il rettangolo precedente ruotato
+    const newHeight = (rectWidth* Math.sin(rad)) + (rectHeight * Math.cos(rad))
+    const newRectX = randomX - newWidth / 2
+    const newRectY = randomY - newHeight / 2
+    const correctedWidth = (randomX - (newWidth / 2) - randomX) + 
+    inputCTX.fillRect(Math.max(0,newRectX), Math.max(0,newRectY), newWidth / 2 +  , newHeight)  //fix
+    // inputCTX.clearRect(0,0,width, height)
 }
