@@ -15,7 +15,7 @@ differenceCanvas.width = width
 let contatore = 0
 let bestDifferenceSoFar = 100
 let rectArray = []
-let bestRectSoFar = [0,0,0,0,0,0,0,0,100]
+let bestRectSoFar = [0,0,0,0,0,0,0,0,0,0,0,]
 let colorTargetInfo  = []
 const inputCTX = canvasInput.getContext('2d')
 const outputCTX = canvasOutput.getContext('2d')
@@ -23,7 +23,7 @@ const targetCTX = targetCanvas.getContext('2d')
 const differenceCTX = differenceCanvas.getContext('2d')
 outputCTX.fillStyle = 'rgba(0, 0, 0, 1)'
 outputCTX.fillRect(0,0,width,height)
-
+let targetImageData 
 
 function makeBase() {
     base_image = new Image();
@@ -31,16 +31,12 @@ function makeBase() {
     base_image.onload = function () {
         targetCTX.drawImage(base_image, 0, 0);
         colorTargetInfo = getRBGAvgAndStdDev(targetCanvas)
-    
-        // setInterval(everythingElse,50)
-        for(let i = 0; i < 1; i++) findOuterRect()
-       
+        targetImageData = targetCTX.getImageData(0, 0, width, height)
+        createRandomRect2()
     }
 }
 
 makeBase()
-
-inputCTX.fillStyle = 'rgba(100, 100, 255, 1)'
 
 function createRandomRect2(){
     inputCTX.save()
@@ -64,22 +60,35 @@ function createRandomRect2(){
     const rad = randomAngle * Math.PI / 180
     inputCTX.translate(randomX, randomY)
     inputCTX.rotate(rad)
+    console.log(randomX,randomY,rectWidth,rectHeight,rad);
     inputCTX.fillRect(-rectWidth / 2, -rectHeight / 2, rectWidth, rectHeight)
-    differenceCTX.drawImage(canvasInput,0,0)
     inputCTX.restore()
-    const difference = differenceBetween2Images()
-    inputCTX.clearRect(0,0,width, height)
-    rectArray.push([difference, red, green, blue, opacity, rad, randomX, randomY, rectWidth, rectHeight])
-    return [difference, red, green, blue, opacity, rad, randomX, randomY, rectWidth, rectHeight]
+    const outerRectangle = findOuterRectFromRandomRect(randomX,randomY,rectWidth,rectHeight,rad)
+    console.log(outerRectangle);
+    // const inputCTXData = inputCTX.getImageData(outerRectangle[0], outerRectangle[1], outerRectangle[2], outerRectangle[3])
+    // const totalDifferenceAndPixelChecked = confrontWithOriginal(
+    //     targetImageData, 
+    //     outputCTX, 
+    //     inputCTXData,
+    //     outerRectangle[0], 
+    //     outerRectangle[1], 
+    //     outerRectangle[2], 
+    //     outerRectangle[3])
+    // inputCTX.restore()
+    // console.log(totalDifferenceAndPixelChecked);
+//     const difference = differenceBetween2Images()
+//     inputCTX.clearRect(0,0,width, height)
+//     rectArray.push([totalDifferenceAndPixelChecked[0], red, green, blue, opacity, rad, randomX, randomY, rectWidth, rectHeight, totalDifferenceAndPixelChecked[1]])
+//     return [totalDifferenceAndPixelChecked[0], red, green, blue, opacity, rad, randomX, randomY, rectWidth, rectHeight, totalDifferenceAndPixelChecked[1]]
 }
 
 function everythingElse() {
     rectArray = []
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 1; i++) {
         createRandomRect2()
-        rectArray.sort((e1,e2) => e1[0] - e2[0])
     }
-    if(bestDifferenceSoFar > rectArray[0][0]){
+    rectArray.sort((e1,e2) => e1[0] - e2[0])
+    if(bestRectSoFar[0] < rectArray[0][0]){
         contatore++
         drawRect(rectArray[0])
         bestDifferenceSoFar = rectArray[0][0]
@@ -91,7 +100,7 @@ function everythingElse() {
 
 }
 
-function drawRect([useless,red, green, blue, opacity, rad, randomX, randomY, rectWidth, rectHeight]){
+function drawRect([difference,red, green, blue, opacity, rad, randomX, randomY, rectWidth, rectHeight, pixelChecked]){
     const colorString = 'rgba(#RED, #GREEN, #BLUE, #OPACITY)'
     outputCTX.save()
     outputCTX.fillStyle = colorString
@@ -164,12 +173,6 @@ function createRandomRect3(){
     inputCTX.translate(randomX, randomY)
     inputCTX.rotate(rad)
     inputCTX.fillRect(-rectWidth / 2, -rectHeight / 2, rectWidth, rectHeight)
-    const tempArray = inputCTX.getImageData(0,0,width,height).data;
-    let sum = 0
-    for(let i = 0; i < tempArray.length; i++){
-        sum += tempArray[i]
-    }
-    console.log(sum);
     const difference = differenceBetween2Images()
     inputCTX.clearRect(0,0,width, height)
     rectArray.push([difference, red, green, blue, opacity, rad, randomX, randomY, rectWidth, rectHeight])
@@ -203,9 +206,56 @@ function findOuterRect(){
     inputCTX.fillStyle = 'rgba(255, 0, 0, 0.5)'
     const newWidth = (rectWidth* Math.cos(rad)) + (rectHeight * Math.sin(rad))  //Dimensioni del rettangolo che contengono il rettangolo precedente ruotato
     const newHeight = (rectWidth* Math.sin(rad)) + (rectHeight * Math.cos(rad))
-    const newRectX = randomX - newWidth / 2
-    const newRectY = randomY - newHeight / 2
-    const correctedWidth = (randomX - (newWidth / 2) - randomX) + 
-    inputCTX.fillRect(Math.max(0,newRectX), Math.max(0,newRectY), newWidth / 2 +  , newHeight)  //fix
-    // inputCTX.clearRect(0,0,width, height)
+    const topLeftX = Math.max(randomX - newWidth / 2, 0)
+    const topLeftY = Math.max(randomY - newHeight / 2, 0)
+    const botRightX = Math.min(randomX + newWidth / 2, width)
+    const botRightY = Math.min(randomY + newHeight / 2, height)
+    const adjustedNewWidth = botRightX - topLeftX
+    const adjustedNewHeight = botRightY - topLeftY
+    inputCTX.fillRect(topLeftX, topLeftY, adjustedNewWidth, adjustedNewHeight)
+    return [topLeftX, topLeftY, adjustedNewWidth, adjustedNewHeight]
 }
+
+function findOuterRectFromRandomRect(x,y,width,height,rotationRad){ //posizione x y centrale del rettangolo;
+    const newWidth = (width* Math.cos(rotationRad)) + (height * Math.sin(rotationRad))  //Dimensioni del rettangolo che contengono il rettangolo precedente ruotato
+    const newHeight = (width* Math.sin(rotationRad)) + (height * Math.cos(rotationRad))
+    const topLeftX = Math.max(x - newWidth / 2, 0)
+    const topLeftY = Math.max(y - newHeight / 2, 0)
+    const botRightX = Math.min(x + newWidth / 2, width)
+    const botRightY = Math.min(y + newHeight / 2, height)
+    const adjustedNewWidth = botRightX - topLeftX
+    const adjustedNewHeight = botRightY - topLeftY
+    inputCTX.fillRect(topLeftX, topLeftY, adjustedNewWidth, adjustedNewHeight)
+    return [topLeftX, topLeftY, adjustedNewWidth, adjustedNewHeight]
+}
+
+function confrontWithOriginal(targetCanvasData, myCanvasCTX, inputImgData, x, y, rectWidth, rectHeight ){
+    //Prendo targetCanvasData creato inizialmente per evitare ogni volta di crearlo
+    //In myCanvasCtx prendo solo i dati del rettangolo interessato dalla modifica
+    const startingPoint = width * y + width - x // il punto di inizio rettangolo in targetcanvasData
+    const addValueForTarget = width - rectWidth // Pixel da skippare in targetcanvas
+    const myData = myCanvasCTX.getImageData(x,y,rectWidth,rectHeight)
+    let totDifference = 0 //somma di tutte le differenze dei singoli pixel
+    let pixelChecked = 0 //il totale dei pixel controllati
+    for (let y = 0; y < rectHeight; y++) {
+        for (let x = 0; x < rectWidth; x++) {
+            const pos = (y * width + x) * 4
+            if(inputImgData[pos+3] === 0) break  //se il pixel input è trasparente, non faccio nessun controllo dato che non cambia l'immagine in quel punto
+            pixelChecked++
+            const targetPos = startingPoint + addValueForTarget * y + x
+            const targetPixel = [targetCanvasData.data[targetPos],targetCanvasData.data[targetPos+1],targetCanvasData.data[targetPos+2]]
+            const myCanvasPixel = [myData.data[targetPos],myData.data[targetPos+1],myData.data[targetPos+2]]
+            const inputPixel = [inputImgData[pos], inputImgData[pos + 1], inputImgData[pos + 2]]
+            const targetMyCanvasDifference = calculateDifference(targetPixel,myCanvasPixel)
+            //sommo il pixel input alla mia canvas 
+            //Aggiungo come dato anche la trasparenza
+            const MyCanvasAndInputPixel = add2colors(inputPixel.push(inputImgData[pos+3]), myCanvasPixel.push(myData[pos + 3]))
+            targetModifiedCanvasDifference = calculateDifference(targetPixel,MyCanvasAndInputPixel)
+            totDifference += targetModifiedCanvasDifference - targetMyCanvasDifference
+        }
+    }
+    return [totDifference, pixelChecked]
+}
+
+
+//testare se la trasparenza influisce sul risultato

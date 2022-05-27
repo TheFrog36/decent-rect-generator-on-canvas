@@ -1,7 +1,6 @@
 function getRBGAvgAndStdDev(canvasElement) {
     const ctx = canvasElement.getContext('2d')
     var imgData = ctx.getImageData(0, 0, canvasElement.width, canvasElement.height)
-    console.log(imgData)
     let imgR = 0
     let imgG = 0
     let imgB = 0
@@ -51,4 +50,17 @@ function generateGaussian(mean, stdDev) {
         hasSpare = true;
         return mean + stdDev * u * s;
     }
+}
+
+function add2colors(color1,color2){    //[R,G,B,A]
+    for(let i = 0; i < 3; i++){  // Converto i numeri da 0-255 a 0-1 RGB
+        color1[i] = color1[i] / 255
+        color2[i] = color2[i] / 255
+    }
+    result = []
+    A = 1 -(1 - color1[3]) * (1 - color2[3]) //Calcolo opacità
+    R = color2[0] * color2[3] / A + color1[0] * color1[3] * (1 - color2[3]) / A;  //result RED
+    G = color2[1] * color2[3] / A + color1[1] * color1[3] * (1 - color2[3]) / A;  //result GREEN
+    B = color2[2] * color2[3] / A + color1[2] * color1[3] * (1 - color2[3]) / A;  //result BLUE
+    return [R *  255, G * 255 , B *  255, A]  
 }
