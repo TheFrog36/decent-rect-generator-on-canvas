@@ -17,6 +17,21 @@ const outputCTX = canvasOutput.getContext('2d')
 const targetCTX = targetCanvas.getContext('2d')
 const differenceCTX = differenceCanvas.getContext('2d')
 
+outputCTX.fillStyle = 'rgba(0, 0, 0, 1)'
+outputCTX.fillRect(0,0,width,height)
+
+
+function calculateDifference(color1,color2){
+    dRsqr = ((color1[0] - color2[0]) / 255  ) ** 2
+    dGsqr = ((color1[1] - color2[1]) / 255) ** 2
+    dBsqr = ((color1[2] - color2[2]) / 255) ** 2
+    Rmod = (color1[0] + color2[0]) / (2 * 255)
+    Rcomp = (2+Rmod) * dRsqr
+    Gcomp = 4*dGsqr
+    Bcomp = (3-Rmod) * dBsqr
+    deltaC = Math.sqrt(Rcomp + Gcomp + Bcomp)
+    return deltaC / 3
+}
 
 
 function createRandomRect(blankCanvasCTX, red, green, blue, opacity){ 
@@ -29,7 +44,7 @@ function createRandomRect(blankCanvasCTX, red, green, blue, opacity){
     .replace('#RED', red)
     .replace('#GREEN',  green)
     .replace('#BLUE',  blue)
-    .replace('#OPACITY', opacity)
+    .replace('#OPACITY', 1)
     const maxRectSize = width < height ? width / 1.2 : height /1.2  //la grandezza massima del rettangolo è la metà del lato più piccolo di canvas
     const randomX = Math.random() * width
     const randomY = Math.random() * height
@@ -52,7 +67,7 @@ function findOuterRectFromRandomRect([x,y,rectWidth,rectHeight,rotationRad]){ //
     const botRightY = Math.min(y + newHeight / 2, height)
     const adjustedNewWidth = botRightX - topLeftX
     const adjustedNewHeight = botRightY - topLeftY
-    return [topLeftX, topLeftY, adjustedNewWidth, adjustedNewHeight]
+    return [Math.floor(topLeftX), Math.floor(topLeftY), Math.floor(adjustedNewWidth), Math.floor(adjustedNewHeight)]
 }
 
 function makeBase() {
@@ -61,17 +76,65 @@ function makeBase() {
     base_image.onload = function () {
         targetCTX.drawImage(base_image, 0, 0);
         colorTargetInfo = getRBGAvgAndStdDev(targetCanvas)
-        const targetImageData = targetCTX.getImageData(0, 0, width, height)
-        for(let i = 0; i < 5; i++){
-            const randomRectInfo = createRandomRect(inputCTX, 100, 100, 100, 0.5)
-            const outerRect = findOuterRectFromRandomRect(randomRectInfo)
-            //dato che il dato del rettangolo esiste su inputCTX anche se non l'ho disegnato,
-            //posso andare a recuperarmelo dopo
-            const randomRectData = inputCTX.getImageData(outerRect[0],outerRect[1],outerRect[2],outerRect[3])
-        }    
-        
-
+        const targetCTXData =  targetCTX.getImageData(0,0,width,height)               
+        outputCTX.drawImage(base_image,0,0)
+       setTimeout(() => everythingElse(targetCTXData ),10) 
     }
 }
 
-makeBase()
+function everythingElse(targetCTXData){
+    
+    for(let i = 0; i < 10; i++){
+        const randomRectInfo = createRandomRect(inputCTX, 123, 123, 299, 0.5)
+        const outerRect = findOuterRectFromRandomRect(randomRectInfo) // [0] topLeftX [1] topLeftY [2] rectWidth [3] rectHeight
+        //dato che il dato del rettangolo esiste su inputCTX anche se non l'ho disegnato,
+        //posso andare a recuperarmelo dopo
+        const inputCTXData = inputCTX.getImageData(outerRect[0],outerRect[1],outerRect[2],outerRect[3])
+        const outputCTXData = outputCTX.getImageData(outerRect[0],outerRect[1],outerRect[2],outerRect[3])
+        let pixelChecked = 0
+        let totalRedInput = 0
+        let totalGreenInput = 0
+        let totalBlueInput = 0
+        let totalRedTarget = 0
+        let totalGreenTarget = 0
+        let totalBlueTarget = 0
+        let totalRedOutput = 0
+        let totalGreenOutput = 0
+        let totalBlueOutput = 0
+        pixelChecked = 0
+
+        let inputTargetDifferenceTot = 0
+        let outputTargetDifferenceTot = 0
+        for (let y = 0; y < outerRect[3]; y++) {
+            for (let x = 0; x < outerRect[2]; x++) {
+
+                const pos = (y * outerRect[2] + x) * 4
+                if (inputCTXData.data[pos + 3] === 0) continue
+                pixelChecked++
+                const startingPointForTarget =( width * outerRect[1] + outerRect [0] + width * y + x ) * 4
+
+                totalRedInput += inputCTXData.data[pos]
+                totalGreenInput += inputCTXData.data[pos + 1]
+                totalBlueInput += inputCTXData.data[pos + 2]
+
+                totalRedOutput += outputCTXData.data[pos]
+                totalGreenOutput += outputCTXData.data[pos + 1]
+                totalBlueOutput += outputCTXData.data[pos + 2]
+
+                totalRedTarget += targetCTXData.data[startingPointForTarget]
+                totalGreenTarget += targetCTXData.data[startingPointForTarget+1]
+                totalBlueTarget += targetCTXData.data[startingPointForTarget + 2]
+            }
+        }
+        const c1 = [totalRedTarget / pixelChecked,totalGreenTarget / pixelChecked,totalBlueTarget / pixelChecked]
+        const c2 = [totalRedInput / pixelChecked,totalGreenInput / pixelChecked,totalBlueInput / pixelChecked]
+        const c3 = [totalRedOutput / pixelChecked, totalGreenOutput / pixelChecked, totalBlueOutput / pixelChecked]
+        inputTargetDifferenceTot = calculateDifference(c2,c1)
+        outputTargetDifferenceTot = calculateDifference(c3,c1)
+        console.log(inputTargetDifferenceTot,outputTargetDifferenceTot);
+        console.log('difference',outputTargetDifferenceTot - inputTargetDifferenceTot);
+        const differenceOfAllPixels = inputTargetDifferenceTot*pixelChecked
+        console.log('allPixels:',differenceOfAllPixels);
+    } 
+}
+// makeBase()

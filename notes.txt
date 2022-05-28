@@ -1,0 +1,14 @@
+genera rettangolo
+calcola outerRect
+get imgData in outeRect area
+if Input pos+3 !== 0 
+calcola difference output target ***
+			sum up all pixel diff
+		   difference target
+			sum up all pixel diff
+add in array rect info + difference
+
+drawRect with highest diff tot
+
+*** Evitar di prendere imgInfo dal target, usare
+    array maths
