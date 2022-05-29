@@ -4,6 +4,7 @@ html, body {
     padding: 0px;
     margin: 0px;
     background: #303055;
+    font-size: 0px;
 }
 
 .container{
@@ -11,3 +12,4 @@ html, body {
     height: 100%;
     margin: auto;
 }
+

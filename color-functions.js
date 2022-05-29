@@ -1,4 +1,4 @@
-function getRBGAvgAndStdDev(canvasElement) {
+function getRGBAvgAndStdDev(canvasElement) {
     const ctx = canvasElement.getContext('2d')
     var imgData = ctx.getImageData(0, 0, canvasElement.width, canvasElement.height)
     let imgR = 0
