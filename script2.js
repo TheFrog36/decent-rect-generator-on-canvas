@@ -27,6 +27,7 @@ let randomRectInfo
 let contatore = 0
 let emprovement = 0
 let differenceOfAllPixels = 0
+let inputAlpha
 //#Fine
 function calculateDifference(color1, color2) {
     dRsqr = ((color1[0] - color2[0]) / 255) ** 2
@@ -110,35 +111,30 @@ function everythingElse(targetCTXData) {
     try {
         bestDifferencecSoFar = 0
         
-        for (let i = 0; i < 500; i++) {
+        const outputCTXData = outputCTX.getImageData(0, 0, width, height)
+        for (let i = 0; i < 1000; i++) {
             const inputRed = Math.max(generateGaussian(targetAllColorsInfo[0][0], targetAllColorsInfo[0][1]), 0)
             const inputGreen = Math.max(generateGaussian(targetAllColorsInfo[1][0], targetAllColorsInfo[1][1]), 0)
             const inputBlue = Math.max(generateGaussian(targetAllColorsInfo[2][0], targetAllColorsInfo[2][1]), 0)
-            // const inputRed = Math.random() * 255 
-            // const inputGreen = Math.random() * 255 
-            // const inputBlue = Math.random() * 255 
-            const inputAlpha = Math.random() * (1 - 0.1) + 0.1  //#TEST rimuovere il commento
+             inputAlpha = Math.random() /** (1 - 0.1) + 0.1*/  //#TEST rimuovere il commento
             randomRectInfo = createRandomRect(inputCTX, inputRed, inputGreen, inputBlue, inputAlpha)   //#TEST rimettere const
             outerRect = findOuterRectFromRandomRect(randomRectInfo) // [0] topLeftX [1] topLeftY [2] rectWidth [3] rectHeight // #TEST rimettere const
             //dato che il dato del rettangolo esiste su inputCTX anche se non l'ho disegnato,
             //posso andare a recuperarmelo dopo
             const inputCTXData = inputCTX.getImageData(outerRect[0], outerRect[1], outerRect[2], outerRect[3])
-            const outputCTXData = outputCTX.getImageData(outerRect[0], outerRect[1], outerRect[2], outerRect[3])
             
 
             let inputTargetDifferenceTot = 0
             let outputTargetDifferenceTot = 0
             for (let y = 0; y < outerRect[3]; y++) {
                 for (let x = 0; x < outerRect[2] ; x++) {
-            // for (let y = 0; y < outerRect[3]; y++) {
-            //     for (let x = 0; x < 1 ; x++) {
 
                     const pos = (y * outerRect[2] + x) * 4
                     if (inputCTXData.data[pos + 3] === 0) continue
                     const startingPointForTarget = (width * outerRect[1] + outerRect[0] + width * y + x) * 4
-                    const outputPixel = [outputCTXData.data[pos],outputCTXData.data[pos+1],outputCTXData.data[pos+2]]
+                    const outputPixel = [outputCTXData.data[startingPointForTarget],outputCTXData.data[startingPointForTarget+1],outputCTXData.data[startingPointForTarget+2]]
                     const targetPixel = [targetCTXData.data[startingPointForTarget],targetCTXData.data[startingPointForTarget+1],targetCTXData.data[startingPointForTarget+2]]
-                    const outputPixelBetter = [outputCTXData.data[pos],outputCTXData.data[pos+1],outputCTXData.data[pos+2],outputCTXData.data[pos+3]/255]
+                    const outputPixelBetter = [outputCTXData.data[startingPointForTarget],outputCTXData.data[startingPointForTarget+1],outputCTXData.data[startingPointForTarget+2],outputCTXData.data[pos+3]/255]
                     const sumInputOutput = add2colors(outputPixelBetter,[inputRed,inputGreen,inputBlue,inputAlpha])
                     outputTargetDifferenceTot += calculateDifference(targetPixel,outputPixel)
                     inputTargetDifferenceTot += calculateDifference(targetPixel,sumInputOutput)
@@ -148,7 +144,7 @@ function everythingElse(targetCTXData) {
             if (bestDifferencecSoFar < emprovement) {
                 bestDifferencecSoFar = emprovement
                 bestRectSoFar = [inputRed, inputGreen, inputBlue, inputAlpha, randomRectInfo[0],
-                randomRectInfo[1], randomRectInfo[2], randomRectInfo[3], randomRectInfo[4],]
+                randomRectInfo[1], randomRectInfo[2], randomRectInfo[3], randomRectInfo[4]]
                 
             }
         }
@@ -160,7 +156,6 @@ function everythingElse(targetCTXData) {
     
     if (bestDifferencecSoFar > 0) {
         console.log('emprovement:',bestDifferencecSoFar);
-
         drawRect(bestRectSoFar)
         contatore++
         console.log(contatore);
