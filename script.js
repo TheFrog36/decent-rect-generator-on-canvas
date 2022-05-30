@@ -126,6 +126,14 @@ function calculateDifference(color1,color2){
     return deltaC / 3
 }
 
+// function calculateDifference(color1,color2){  //Differenza con pitagora (prob faster), fare tests con rettangoli uguali 
+//     dRsqr = ((color1[0] - color2[0]) / 255  ) ** 2
+//     dGsqr = ((color1[1] - color2[1]) / 255) ** 2
+//     dBsqr = ((color1[2] - color2[2]) / 255) ** 2
+   
+//     deltaC = Math.sqrt(dRsqr + dGsqr + dBsqr)
+//     return deltaC / 1.7320508075688772
+// }
 
 function differenceBetween2Images() {
     let targetImageData = targetCTX.getImageData(0, 0, width, height)

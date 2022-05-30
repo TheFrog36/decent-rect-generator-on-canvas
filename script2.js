@@ -101,9 +101,8 @@ function makeBase() {
         const targetCTXData = targetCTX.getImageData(0, 0, width, height)
         // outputCTX.drawImage(base_image,0,0)
         targetAllColorsInfo = getRGBAvgAndStdDev(targetCanvas)
-        setInterval(() => everythingElse(targetCTXData), 10)
-
-
+        for(let i = 0; i < 401; i++) setTimeout(() => everythingElse(targetCTXData), 1)
+        console.log('done');
     }
 }
 
@@ -167,3 +166,6 @@ function everythingElse(targetCTXData) {
 }
 // makeBase()
 
+function stopP(){
+    window.stop()
+}
