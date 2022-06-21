@@ -1,4 +1,4 @@
-const imgUrl = './cat.png'
+const imgUrl = './monalisa.png'
 let width 
 let height 
 const canvasInput = document.getElementById('canvas-input')
@@ -85,7 +85,7 @@ function findOuterRectFromRandomRect([x, y, rectWidth, rectHeight, rotationRad])
     const botRightY = Math.min(y + newHeight / 2, height)
     const adjustedNewWidth = botRightX - topLeftX
     const adjustedNewHeight = botRightY - topLeftY
-    return [Math.floor(topLeftX), Math.floor(topLeftY), Math.floor(adjustedNewWidth), Math.floor(adjustedNewHeight)]
+    return {topleftX: Math.floor(topLeftX), topLeftY:Math.floor(topLeftY), outerRectWidth: Math.floor(adjustedNewWidth), outerRectHeight: Math.floor(adjustedNewHeight)}
 }
 
 function drawRect([red, green, blue, opacity, randomX, randomY, rectWidth, rectHeight, rad]) {
