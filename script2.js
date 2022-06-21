@@ -159,12 +159,13 @@ function everythingElse(targetCTXData) {
         console.log('Improvement:',Math.round(bestDifferencecSoFar * 1000) / 1000);
         drawRect(bestRectSoFar)
         contatore++
-        console.log(contatore);
+        console.log('rettangoli aggiunti:', contatore);
     } else {
         console.log('lippa');
     }
     totCounter++
     console.log('tot', totCounter)
+    console.log('generazioni fallite:', totCounter - contatore)
     //save current highest score differenceOfAllPixels
     //and its sizes
 }
