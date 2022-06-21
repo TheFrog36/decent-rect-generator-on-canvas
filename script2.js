@@ -85,7 +85,7 @@ function findOuterRectFromRandomRect([x, y, rectWidth, rectHeight, rotationRad])
     const botRightY = Math.min(y + newHeight / 2, height)
     const adjustedNewWidth = botRightX - topLeftX
     const adjustedNewHeight = botRightY - topLeftY
-    return {topleftX: Math.floor(topLeftX), topLeftY:Math.floor(topLeftY), outerRectWidth: Math.floor(adjustedNewWidth), outerRectHeight: Math.floor(adjustedNewHeight)}
+    return [Math.floor(topLeftX), Math.floor(topLeftY),Math.floor(adjustedNewWidth),Math.floor(adjustedNewHeight)]
 }
 
 function drawRect([red, green, blue, opacity, randomX, randomY, rectWidth, rectHeight, rad]) {
