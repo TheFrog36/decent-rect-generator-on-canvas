@@ -1,4 +1,4 @@
-const imgUrl = './cyberpunk.png'
+const imgUrl = './cat.png'
 let width 
 let height 
 const canvasInput = document.getElementById('canvas-input')
@@ -103,6 +103,7 @@ function drawRect([red, green, blue, opacity, randomX, randomY, rectWidth, rectH
 }
 
 function makeBase() {
+    document.getElementById('start-button').style.display = 'none'
     base_image = new Image();
     base_image.src = imgUrl;
     base_image.onload = function () {
@@ -117,6 +118,17 @@ function makeBase() {
         for(let i = 0; i < 10000; i++) setTimeout(() => everythingElse(targetCTXData), 1)
         console.log('done');
     }
+}
+
+function updateInfoDiv(){
+    const template = `
+        Cycle: #CYCLE
+        Added: #ADDED
+        Failed: #FAILED`
+    const infoDiv = document.getElementById('info')
+    infoDiv.innerHTML = template.replace('#CYCLE', totCounter)
+        .replace('#ADDED', contatore)
+        .replace('#FAILED', totCounter - contatore)
 }
 
 function everythingElse(targetCTXData) {
@@ -175,6 +187,7 @@ function everythingElse(targetCTXData) {
         console.log('lippa');
     }
     totCounter++
+    updateInfoDiv()
     console.log('tot', totCounter)
     console.log('generazioni fallite:', totCounter - contatore)
     //save current highest score differenceOfAllPixels

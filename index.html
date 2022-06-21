@@ -8,13 +8,13 @@
     <title>Document</title>
 </head>
 <body>
-    <button onclick="makeBase()">start</button>
     <div class="container">
+        <button onclick="makeBase()" id="start-button">start</button>
+        <div id="info"></div>
         <canvas id="target-img"></canvas>
         <canvas id="canvas-output" class="canvas-output"></canvas>
         <canvas id="difference-canvas" style="display: none;"></canvas>
         <canvas id="canvas-input" class="canvas-input" style="display: none;"></canvas>
-        <div id="info"></div>
     </div>
 </body>
 <script src="./color-functions.js"></script>

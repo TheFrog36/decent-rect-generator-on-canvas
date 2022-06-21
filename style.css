@@ -10,13 +10,21 @@ html, body {
 .container{
     width: 100%;
     height: 100%;
+    overflow: auto;
 }
 
-canvas{
-    width: 100%;
-}
+@media only screen and (max-width: 600px) {
+    canvas{
+        width: 100%;
+    }
+  }
 
 #info{
-    position: static;
-    
+    font-size: medium;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    color: rgb(230, 223, 205);
+    width: fit-content;
+    height: fit-content;
 }
