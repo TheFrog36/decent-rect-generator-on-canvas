@@ -1,23 +1,16 @@
-const width = 600
-const height = 800
+const imgUrl = './aivazovsky.png'
+let width 
+let height 
 const canvasInput = document.getElementById('canvas-input')
 const canvasOutput = document.getElementById('canvas-output')
 const targetCanvas = document.getElementById('target-img')
 const differenceCanvas = document.getElementById('difference-canvas')
-canvasInput.width = width
-canvasInput.height = height
-canvasOutput.width = width
-canvasOutput.height = height
-targetCanvas.height = height
-targetCanvas.width = width
-differenceCanvas.height = height
-differenceCanvas.width = width
+
 const inputCTX = canvasInput.getContext('2d')
 const outputCTX = canvasOutput.getContext('2d')
 const targetCTX = targetCanvas.getContext('2d')
 const differenceCTX = differenceCanvas.getContext('2d')
-outputCTX.fillStyle = 'rgba(255, 255, 255, 1)'
-outputCTX.fillRect(0, 0, width, height)
+
 let targetAllColorsInfo
 let bestDifferencecSoFar = 0
 let bestRectSoFar
@@ -30,6 +23,19 @@ let differenceOfAllPixels = 0
 let inputAlpha
 
 let totCounter = 0
+
+function setCanvasSizes(){
+    canvasInput.width = width
+    canvasInput.height = height
+    canvasOutput.width = width
+    canvasOutput.height = height
+    targetCanvas.height = height
+    targetCanvas.width = width
+    differenceCanvas.height = height
+    differenceCanvas.width = width
+    outputCTX.fillStyle = 'rgba(255, 255, 255, 1)'
+    outputCTX.fillRect(0, 0, width, height)
+}
 //#Fine
 function calculateDifference(color1, color2) {
     dRsqr = ((color1[0] - color2[0]) / 255) ** 2
@@ -58,8 +64,10 @@ function createRandomRect(blankCanvasCTX, red, green, blue, opacity) {
     const maxRectSize = width < height ? width / 1.2 : height / 1.2  //la grandezza massima del rettangolo è la metà del lato più piccolo di canvas
     const randomX = Math.random() * width
     const randomY = Math.random() * height
-    const rectWidth = Math.random() * (maxRectSize - 2) + 2
-    const rectHeight = Math.random() * (maxRectSize - 2) + 2
+    // const rectWidth = Math.random() * (maxRectSize - 2) + 2
+    // const rectHeight = Math.random() * (maxRectSize - 2) + 2
+    const rectHeight = Math.random() * 100 + 2
+    const rectWidth = Math.random() * 100 + 2
     const randomAngle = Math.random() * 90
     const rad = randomAngle * Math.PI / 180
     blankCanvasCTX.translate(randomX, randomY)
@@ -96,8 +104,11 @@ function drawRect([red, green, blue, opacity, randomX, randomY, rectWidth, rectH
 
 function makeBase() {
     base_image = new Image();
-    base_image.src = './monalisa.png';
+    base_image.src = imgUrl;
     base_image.onload = function () {
+        height = base_image.height
+        width = base_image.width
+        setCanvasSizes()
         targetCTX.drawImage(base_image, 0, 0);
         colorTargetInfo = getRGBAvgAndStdDev(targetCanvas)
         const targetCTXData = targetCTX.getImageData(0, 0, width, height)
