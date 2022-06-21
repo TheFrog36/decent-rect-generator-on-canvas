@@ -12,3 +12,11 @@ html, body {
     height: 100%;
 }
 
+canvas{
+    width: 100%;
+}
+
+#info{
+    position: static;
+    
+}
