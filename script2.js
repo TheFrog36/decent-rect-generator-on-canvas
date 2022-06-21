@@ -1,4 +1,4 @@
-const imgUrl = './aivazovsky.png'
+const imgUrl = './cyberpunk.png'
 let width 
 let height 
 const canvasInput = document.getElementById('canvas-input')
