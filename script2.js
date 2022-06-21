@@ -1,4 +1,4 @@
-const imgUrl = './frog.png'
+const imgUrl = './cat.png'
 let width 
 let height 
 const canvasInput = document.getElementById('canvas-input')
