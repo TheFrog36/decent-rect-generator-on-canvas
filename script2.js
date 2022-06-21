@@ -16,7 +16,7 @@ const inputCTX = canvasInput.getContext('2d')
 const outputCTX = canvasOutput.getContext('2d')
 const targetCTX = targetCanvas.getContext('2d')
 const differenceCTX = differenceCanvas.getContext('2d')
-outputCTX.fillStyle = 'rgba(0, 0, 0, 1)'
+outputCTX.fillStyle = 'rgba(255, 255, 255, 1)'
 outputCTX.fillRect(0, 0, width, height)
 let targetAllColorsInfo
 let bestDifferencecSoFar = 0
@@ -28,6 +28,8 @@ let contatore = 0
 let emprovement = 0
 let differenceOfAllPixels = 0
 let inputAlpha
+
+let totCounter = 0
 //#Fine
 function calculateDifference(color1, color2) {
     dRsqr = ((color1[0] - color2[0]) / 255) ** 2
@@ -101,7 +103,7 @@ function makeBase() {
         const targetCTXData = targetCTX.getImageData(0, 0, width, height)
         // outputCTX.drawImage(base_image,0,0)
         targetAllColorsInfo = getRGBAvgAndStdDev(targetCanvas)
-        for(let i = 0; i < 401; i++) setTimeout(() => everythingElse(targetCTXData), 1)
+        for(let i = 0; i < 10000; i++) setTimeout(() => everythingElse(targetCTXData), 1)
         console.log('done');
     }
 }
@@ -111,11 +113,11 @@ function everythingElse(targetCTXData) {
         bestDifferencecSoFar = 0
         
         const outputCTXData = outputCTX.getImageData(0, 0, width, height)
-        for (let i = 0; i < 1000; i++) {
+        for (let i = 0; i < 100; i++) {
             const inputRed = Math.max(generateGaussian(targetAllColorsInfo[0][0], targetAllColorsInfo[0][1]), 0)
             const inputGreen = Math.max(generateGaussian(targetAllColorsInfo[1][0], targetAllColorsInfo[1][1]), 0)
             const inputBlue = Math.max(generateGaussian(targetAllColorsInfo[2][0], targetAllColorsInfo[2][1]), 0)
-             inputAlpha = Math.random() /** (1 - 0.1) + 0.1*/  //#TEST rimuovere il commento
+             inputAlpha = Math.random() * (1 - 0.1) + 0.1
             randomRectInfo = createRandomRect(inputCTX, inputRed, inputGreen, inputBlue, inputAlpha)   //#TEST rimettere const
             outerRect = findOuterRectFromRandomRect(randomRectInfo) // [0] topLeftX [1] topLeftY [2] rectWidth [3] rectHeight // #TEST rimettere const
             //dato che il dato del rettangolo esiste su inputCTX anche se non l'ho disegnato,
@@ -154,13 +156,15 @@ function everythingElse(targetCTXData) {
     }
     
     if (bestDifferencecSoFar > 0) {
-        console.log('emprovement:',bestDifferencecSoFar);
+        console.log('Improvement:',Math.round(bestDifferencecSoFar * 1000) / 1000);
         drawRect(bestRectSoFar)
         contatore++
         console.log(contatore);
     } else {
         console.log('lippa');
     }
+    totCounter++
+    console.log('tot', totCounter)
     //save current highest score differenceOfAllPixels
     //and its sizes
 }
