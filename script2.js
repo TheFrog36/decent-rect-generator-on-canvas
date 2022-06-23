@@ -1,4 +1,4 @@
-const imgUrl = './monalisa.png'
+const imgUrl = './images/cat.png'
 let width 
 let height 
 const canvasInput = document.getElementById('canvas-input')
@@ -37,6 +37,7 @@ function setCanvasSizes(){
     outputCTX.fillRect(0, 0, width, height)
 }
 //#Fine
+
 function calculateDifference(color1, color2) {
     dRsqr = ((color1[0] - color2[0]) / 255) ** 2
     dGsqr = ((color1[1] - color2[1]) / 255) ** 2
@@ -140,7 +141,8 @@ function everythingElse(targetCTXData) {
             const inputRed = Math.max(generateGaussian(targetAllColorsInfo[0][0], targetAllColorsInfo[0][1]), 0)
             const inputGreen = Math.max(generateGaussian(targetAllColorsInfo[1][0], targetAllColorsInfo[1][1]), 0)
             const inputBlue = Math.max(generateGaussian(targetAllColorsInfo[2][0], targetAllColorsInfo[2][1]), 0)
-             inputAlpha = Math.random() * (1 - 0.1) + 0.1
+            // inputAlpha = Math.random() * (1 - 0.1) + 0.1  // #TEST 
+            inputAlpha = 0.2
             randomRectInfo = createRandomRect(inputCTX, inputRed, inputGreen, inputBlue, inputAlpha)   //#TEST rimettere const
             outerRect = findOuterRectFromRandomRect(randomRectInfo) // [0] topLeftX [1] topLeftY [2] rectWidth [3] rectHeight // #TEST rimettere const
             //dato che il dato del rettangolo esiste su inputCTX anche se non l'ho disegnato,
